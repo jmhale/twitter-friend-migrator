@@ -34,7 +34,7 @@ class TwitterMigrator():
         except twitter.error.TwitterError as ex:
             for error_message in ex.message:
                 if error_message['code'] == 88:
-                    print("We've hit the get_users rate limit for now. Try again later. Exiting.")
+                    print("We've hit the get_users rate limit for now. Please try again later.")
                     sys.exit(1)
                 else:
                     raise
@@ -122,8 +122,11 @@ def main():
         verbose=verbose)
 
     new_friends = migrator.get_new_friends(source_account=source_account)
-    print("The account {} is following {} Twitter accounts that you are not.".format(source_account, len(new_friends)))
-    migrator.follow_users(new_friends)
+    if new_friends:
+        print("The account {} is following {} Twitter accounts that you are not.".format(source_account, len(new_friends)))
+        migrator.follow_users(new_friends)
+    else:
+        print("The account {} is not following anyone that you're not already following. Nothing to do.".format(source_account))
 
 if __name__ == "__main__":
     main()
