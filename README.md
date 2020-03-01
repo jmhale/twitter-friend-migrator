@@ -11,6 +11,8 @@ Before running this, you will need to sign up for a Twitter Developer account, a
 https://developer.twitter.com/
 
 ### Sample config
+Create a config file at `./twitter-friend-migrator.conf`
+
 ```
 [default]
 verbose = True
