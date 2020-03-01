@@ -17,6 +17,13 @@ class TwitterMigrator():
         self.dry_run = dry_run
         self.verbose = verbose
 
+    def get_current_user(self):
+        """
+        Returns the name of the authenticated user
+        """
+        current_user = self.api.VerifyCredentials()
+        return current_user.screen_name
+
     def get_users(self, screen_name=None):
         """ 
         Returns a list of user names that the account follows (friends) 
@@ -47,6 +54,8 @@ class TwitterMigrator():
         """
         Takes a list of user names and follows them
         """
+
+        current_user = self.get_current_user()
         if self.verbose:
             print("List of new users to follow:")
             for friend in users_to_follow:
@@ -62,11 +71,12 @@ class TwitterMigrator():
                 if len(users_to_follow) > 400:
                     print("The number of users to follow: {}, is greater than what the Twitter API will allow in a 24-hour period (400). You will have to run this multiple times to complete the migration".format(len(users_to_follow)))
                 for user in users_to_follow:
-                    if self.verbose:
-                        print("Attempting to follow {}".format(user))
-                    res = self.api.CreateFriendship(screen_name=user, follow=True, retweets=False) 
-                    if self.verbose:
-                        print("Sucessfully followed: {}".format(res.name))
+                    if user != current_user:
+                        if self.verbose:
+                            print("Attempting to follow {}".format(user))
+                        res = self.api.CreateFriendship(screen_name=user, follow=True, retweets=False) 
+                        if self.verbose:
+                            print("Sucessfully followed: {}".format(res.screen_name))
         else:
             print("Not following users.")
 def main():
