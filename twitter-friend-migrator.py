@@ -74,7 +74,7 @@ class TwitterMigrator():
                     if user != current_user:
                         if self.verbose:
                             print("Attempting to follow {}".format(user))
-                        res = self.api.CreateFriendship(screen_name=user, follow=True, retweets=False) 
+                        res = self.api.CreateFriendship(screen_name=user, follow=False, retweets=False) 
                         if self.verbose:
                             print("Sucessfully followed: {}".format(res.screen_name))
         else:
