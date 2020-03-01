@@ -1,3 +1,4 @@
+import sys
 import configparser
 import twitter
 
@@ -28,8 +29,15 @@ class TwitterMigrator():
         """ 
         Returns a list of user names that the account follows (friends) 
         """
-
-        friends_objs = self.api.GetFriends(screen_name=screen_name)
+        try:
+            friends_objs = self.api.GetFriends(screen_name=screen_name)
+        except twitter.error.TwitterError as ex:
+            for error_message in ex.message:
+                if error_message['code'] == 88:
+                    print("We've hit the get_users rate limit for now. Try again later. Exiting.")
+                    sys.exit(1)
+                else:
+                    raise
         friends_names = []
 
         for user in friends_objs:  
@@ -74,9 +82,19 @@ class TwitterMigrator():
                     if user != current_user:
                         if self.verbose:
                             print("Attempting to follow {}".format(user))
-                        res = self.api.CreateFriendship(screen_name=user, follow=False, retweets=False) 
-                        if self.verbose:
-                            print("Sucessfully followed: {}".format(res.screen_name))
+                        try:
+                            res = self.api.CreateFriendship(screen_name=user, follow=False, retweets=False) 
+                            if self.verbose:
+                                print("Sucessfully followed: {}".format(res.screen_name))
+                        except twitter.error.TwitterError as ex:
+                            for error_message in ex.message:
+                                if error_message['code'] == 160:
+                                    print("We've already requested to follow {}, skipping.".format(user))
+                                elif error_message['code'] == 161:
+                                    print("We've hit the follow rate limit for now. Try again later. Exiting.")
+                                    sys.exit(1)
+                                else:
+                                    raise
         else:
             print("Not following users.")
 def main():
