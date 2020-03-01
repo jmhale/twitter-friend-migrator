@@ -47,8 +47,6 @@ class TwitterMigrator():
         """
         Takes a list of user names and follows them
         """
-        print(self.dry_run)
-        print(self.verbose)
         if self.verbose:
             print("List of new users to follow:")
             for friend in users_to_follow:
